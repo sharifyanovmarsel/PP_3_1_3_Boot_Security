@@ -52,13 +52,6 @@ public class UsersController {
         return "people/admin/admin";
     }
 
-
-    @GetMapping("/admin/show_all")
-    public String index(Model model) {
-        model.addAttribute("people", userService.getAllUsers());
-        return "people/admin/all_users";
-    }
-
     @GetMapping("/user")
     public String user(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -68,26 +61,11 @@ public class UsersController {
         return "people/user";
     }
 
-    @GetMapping("/show")
-    public String showUser(@RequestParam("id") int id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-        return "people/user";
-    }
-
-    @GetMapping("/admin/new")
-    public String newPerson(Model model) {
-        model.addAttribute("user", new User());
-        List<Role> allRoles = roleRepository.findAll();
-        model.addAttribute("allRoles", allRoles);
-        return "people/admin/admin";
-    }
-
     @PostMapping("/")
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
                          @RequestParam("selectedRoles") List<Integer> selectedRoleIds, Model model) {
         if (bindingResult.hasErrors()) {
-            return "people/admin/new";
+            return "people/admin/admin";
         }
         model.addAttribute("newUser", new User());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -101,14 +79,6 @@ public class UsersController {
         user.setRoles(allRoles);
         userService.save(user);
         return "redirect:/admin";
-    }
-
-    @GetMapping("/admin/edit")
-    public String edit(Model model, @RequestParam("id") int id) {
-        List<Role> allRoles = roleRepository.findAll();
-        model.addAttribute("user", userService.getUserById(id));
-        model.addAttribute("allRoles", allRoles);
-        return "people/admin/edit";
     }
 
     @PatchMapping("/admin/update")
@@ -134,7 +104,6 @@ public class UsersController {
 
     @DeleteMapping("/admin/delete")
     public String delete(@RequestParam("id") int id) {
-        System.out.println(userService.getUserById(id));
         userService.delete(userService.getUserById(id));
         return "redirect:/admin";
     }
