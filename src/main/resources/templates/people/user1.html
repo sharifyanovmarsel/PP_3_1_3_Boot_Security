@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Show</title>
+</head>
+<body>
+<p th:text="${'Name: ' + user.getName() + ', ' + user.getAge()}">VALUE</p>
+<p th:text="${'Email: ' + user.getEmail()}">VALUE</p>
+<p th:text="${'Id: ' + user.getId()}">VALUE</p>
+<p th:text="${user.getRolesAsText()}">VALUE</p>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    <a th:href="@{admin/edit(id=${user.getId()})}">Edit</a>
+    <form th:method="DELETE" th:action="@{admin/delete(id=${user.getId()})}">
+        <input type="submit" value="Delete"/>
+    </form>
+    <a href="admin/show_all">All users</a>
+</div>
+
+<br>
+<a th:if="${#authentication != null and #authentication.authenticated}" th:href="@{/}">Logout</a>
+
+</body>
+</html>

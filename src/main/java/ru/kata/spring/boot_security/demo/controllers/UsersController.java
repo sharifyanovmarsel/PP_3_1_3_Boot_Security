@@ -36,7 +36,7 @@ public class UsersController {
 
     @GetMapping("/")
     public String index() {
-        return "index";
+        return "redirect:/login";
     }
 
     @GetMapping("/admin")
@@ -45,6 +45,7 @@ public class UsersController {
         String username = authentication.getName();
         User user = userService.getUserByName(username);
         List<Role> allRoles = roleRepository.findAll();
+        model.addAttribute("newUser", new User());
         model.addAttribute("allRoles", allRoles);
         model.addAttribute("people", userService.getAllUsers());
         model.addAttribute("user", user);
@@ -84,10 +85,11 @@ public class UsersController {
 
     @PostMapping("/")
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-                         @RequestParam("selectedRoles") List<Integer> selectedRoleIds) {
+                         @RequestParam("selectedRoles") List<Integer> selectedRoleIds, Model model) {
         if (bindingResult.hasErrors()) {
             return "people/admin/new";
         }
+        model.addAttribute("newUser", new User());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Set<Role> allRoles = new HashSet<>();
         if (selectedRoleIds != null) {
@@ -115,7 +117,7 @@ public class UsersController {
                          @RequestParam("id") int id,
                          @RequestParam("selectedRoles") List<Integer> selectedRoleIds) {
         if (bindingResult.hasErrors()) {
-            return "people/admin/edit";
+            return "redirect:/admin";
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Set<Role> allRoles = new HashSet<>();
@@ -127,11 +129,12 @@ public class UsersController {
         }
         user.setRoles(allRoles);
         userService.update(id, user);
-        return "redirect:/admin/show_all";
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/admin/delete")
     public String delete(@RequestParam("id") int id) {
+        System.out.println(userService.getUserById(id));
         userService.delete(userService.getUserById(id));
         return "redirect:/admin";
     }
